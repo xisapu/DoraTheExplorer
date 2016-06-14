@@ -1,8 +1,15 @@
-var url = "http://10.3.117.4:8080/"
+var baseUrl = "http://10.3.117.4:8080/";
+var url = baseUrl;
 
 
 function setup() {
-	loadDirectory(url, changeUrls);
+	loadDirectory(url, parsePage);
+}
+
+
+function parsePage() {
+	changeUrls();
+	createFatherDirectoryLink();
 }
 
 
@@ -40,6 +47,26 @@ function changeUrls() {
 
 
 function loadNewDirectory (dirctoryUrl) {
-	url += dirctoryUrl;
-	loadDirectory(url, changeUrls);
+	if (dirctoryUrl === "/") {
+		if (url !== baseUrl) {
+			var index = url.lastIndexOf("/", url.length - 2);
+			url = url.substr(0, index + 1);
+		}
+	}
+	else {
+		url += dirctoryUrl;
+	}
+	loadDirectory(url, parsePage);
+}
+
+
+function createFatherDirectoryLink() {
+	var table = document.getElementById("tb");
+	var row = table.insertRow(0);
+	var link_cell = row.insertCell(0);
+	var link = document.createElement("p");
+	link.className = "links";
+	link.textContent = "father directory";
+	link.onclick = function() {loadNewDirectory("/")}
+	link_cell.appendChild(link);
 }
