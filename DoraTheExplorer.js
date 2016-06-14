@@ -8,8 +8,14 @@ function setup() {
 
 
 function parsePage() {
-	changeUrls();
-	createFatherDirectoryLink();
+	var table = document.getElementById("tb");
+	if (table) {
+		changeUrls(table);
+		createFatherDirectoryLink(table);
+	}
+	else {
+		createFatherDirectoryLinkForFilePage(table);
+	}
 }
 
 
@@ -28,8 +34,7 @@ function loadDirectory(dirctoryUrl, functionAfterResponse) {
 }
 
 
-function changeUrls() {
-	var table = document.getElementById("tb");
+function changeUrls(table) {
 	for (var i = 0; i < table.rows.length; i++) {
 		var row = table.rows[i];
 		if (row.getElementsByTagName("a").length !== 0) {
@@ -39,7 +44,7 @@ function changeUrls() {
 			var link = document.createElement("p");
 			link.className = "links";
 			link.textContent = text;
-			link.onclick = function() {loadNewDirectory(this.textContent)}
+			link.onclick = function() {loadNewDirectory(url + this.textContent)}
 			link_cell.appendChild(link);
 		}
 	}
@@ -47,26 +52,30 @@ function changeUrls() {
 
 
 function loadNewDirectory (dirctoryUrl) {
-	if (dirctoryUrl === "/") {
-		if (url !== baseUrl) {
-			var index = url.lastIndexOf("/", url.length - 2);
-			url = url.substr(0, index + 1);
-		}
-	}
-	else {
-		url += dirctoryUrl;
-	}
+	url = dirctoryUrl;
 	loadDirectory(url, parsePage);
 }
 
 
-function createFatherDirectoryLink() {
-	var table = document.getElementById("tb");
+function createFatherDirectoryLink(table) {
 	var row = table.insertRow(0);
 	var link_cell = row.insertCell(0);
 	var link = document.createElement("p");
 	link.className = "links";
 	link.textContent = "father directory";
-	link.onclick = function() {loadNewDirectory("/")}
+	var link_text = url;
+	if (url !== baseUrl) {
+		var index = url.lastIndexOf("/", url.length - 2);
+		link_text = url.substr(0, index + 1);
+	}
+	link.onclick = function() {loadNewDirectory(link_text)}
 	link_cell.appendChild(link);
+}
+
+
+function createFatherDirectoryLinkForFilePage() {
+	var table = document.createElement("table");
+	createFatherDirectoryLink(table);
+	var body = document.getElementById("content");
+	body.appendChild(table);
 }
